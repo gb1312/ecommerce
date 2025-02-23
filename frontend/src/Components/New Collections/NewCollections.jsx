@@ -8,7 +8,7 @@ const NewCollections = () => {
   const [new_collection,setNew_collection] = useState([])
 
   useEffect(() =>{
-    fetch('https://silver-chainsaw-r44g7pgr4vgqfpjwr-4000.app.github.dev/newcollections')
+    fetch('https://ecommerce-backend-g21q.onrender.com/newcollections')
     .then((response)=>response.json())
     .then((data)=>setNew_collection(data));
   },[])

@@ -8,15 +8,8 @@ const ListProduct = () => {
   const[allproducts,setAllProducts] = useState([]);
 
   const fetchInfo = async () => {
-    await fetch('https://silver-chainsaw-r44g7pgr4vgqfpjwr-4000.app.github.dev/allproducts', {
-      mode: "no-cors"
-    })
-    .then(async (res) => {
-      
-      const k = await res.text()
-      console.log("HMMMM", k);
-    } 
-    )
+    await fetch('https://ecommerce-backend-g21q.onrender.com/allproducts')
+    .then(async (res) => res.json())
     .then((data)=>{setAllProducts(data)})
   }
 
@@ -25,7 +18,7 @@ const ListProduct = () => {
   },[])
 
   const remove_product = async (id) =>{
-    await fetch('https://silver-chainsaw-r44g7pgr4vgqfpjwr-4000.app.github.dev/removeproduct',{
+    await fetch('https://ecommerce-backend-g21q.onrender.com/removeproduct',{
       method:'POST',
       headers:{
         Accept:'application/json',

@@ -30,7 +30,7 @@ const AddProduct = () => {
         let formData = new FormData();
         formData.append('product',image);
 
-        await fetch('https://silver-chainsaw-r44g7pgr4vgqfpjwr-4000.app.github.dev/upload',{
+        await fetch('https://ecommerce-backend-g21q.onrender.com/upload',{
           method: 'POST',
           headers:{
             Accept:'application/json',
@@ -41,7 +41,7 @@ const AddProduct = () => {
         if(responseData.success){
           product.image = responseData.image_url;
           console.log(product);
-          await fetch('https://silver-chainsaw-r44g7pgr4vgqfpjwr-4000.app.github.dev/addproduct',{
+          await fetch('https://ecommerce-backend-g21q.onrender.com/addproduct',{
             method: 'POST',
             headers: {
               Accept:'application/json',

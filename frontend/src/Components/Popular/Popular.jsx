@@ -7,7 +7,7 @@ const Popular = () => {
 
   const [popularProducts,setPopularProducts] = useState([]);
   useEffect(()=> {
-    fetch('https://silver-chainsaw-r44g7pgr4vgqfpjwr-4000.app.github.dev/popularinwomen')
+    fetch('https://ecommerce-backend-g21q.onrender.com/popularinwomen')
     .then((response)=>response.json())
     .then((data)=>setPopularProducts(data));
   },[])

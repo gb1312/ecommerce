@@ -5,76 +5,74 @@ import { useState } from 'react';
 export const ShopContext = createContext(null);
 const getDefaultCart = () => {
   let cart = {};
-  for (let index = 0; index < 300+1; index++) {
-    cart[index] = 0;      
+  for (let index = 0; index < 300 + 1; index++) {
+    cart[index] = 0;
   }
   return cart;
 }
 
 const ShopContextProvider = (props) => {
 
-  const [all_product,setAll_Product] = useState([]);
-  const [cartItems,setCartItems] = useState(getDefaultCart());
-  
+  const [all_product, setAll_Product] = useState([]);
+  const [cartItems, setCartItems] = useState(getDefaultCart());
+
   useEffect(() => {
-    fetch('https://silver-chainsaw-r44g7pgr4vgqfpjwr-4000.app.github.dev/allproducts')
-    .then((response)=>response.json())
-    .then((data)=>setAll_Product(data))
-    if(localStorage.getItem('auth-token')){
-      fetch('https://silver-chainsaw-r44g7pgr4vgqfpjwr-4000.app.github.dev/getcart',{
-        method:'POST',
-        headers:{
-          Accept:'application/form-data',
-          'auth-token': `${localStorage.getItem('auth-token')}`,
-          'Content-Type':'application/json',
-        },
-        body:"",
-      }).then((response)=>response.json())
-      .then((data)=>setCartItems(data));
-    }
-  },[])
-  
-  const addToCart = (itemId) => {
-    setCartItems((prev)=>({...prev,[itemId]:prev[itemId]+1}))
-    if(localStorage.getItem('auth-token')){
-      fetch('https://silver-chainsaw-r44g7pgr4vgqfpjwr-4000.app.github.dev/addtocart',{
+    fetch('https://ecommerce-backend-g21q.onrender.com/allproducts')
+      .then((response) => response.json())
+      .then((data) => setAll_Product(data))
+    if (localStorage.getItem('auth-token')) {
+      fetch('https://ecommerce-backend-g21q.onrender.com/getcart', {
         method: 'POST',
-        headers:{
-          Accept:'application/form-data',
+        headers: {
+          Accept: 'application/form-data',
           'auth-token': `${localStorage.getItem('auth-token')}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({"itemId":itemId}),
+        body: JSON.stringify({ user : { "id": localStorage.getItem('user-id')}  }),
+      }).then((response) => response.json())
+        .then((data) => setCartItems(data));
+    }
+  }, [])
+
+  const addToCart = (itemId) => {    
+    setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }))
+    if (localStorage.getItem('auth-token') && localStorage.getItem('user-id')) {
+      fetch('https://ecommerce-backend-g21q.onrender.com/addtocart', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/form-data',
+          'auth-token': `${localStorage.getItem('auth-token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ "itemId": itemId, user : { "id": localStorage.getItem('user-id')} }),
       })
-      .then((response)=>response.json())
-      .then((data)=>console.log(data));
+        .then((response) => response.text())
+        .then((data) => console.log(data));
     }
   }
 
   const removeFromCart = (itemId) => {
-    setCartItems((prev)=>({...prev,[itemId]:prev[itemId]-1}));
-    if(localStorage.getItem('auth-token')){
-      fetch('https://silver-chainsaw-r44g7pgr4vgqfpjwr-4000.app.github.dev/removefromcart',{
+    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
+    if (localStorage.getItem('auth-token') && localStorage.getItem('user-id')) {
+      fetch('https://ecommerce-backend-g21q.onrender.com/removefromcart', {
         method: 'POST',
-        headers:{
-          Accept:'application/form-data',
+        headers: {
+          Accept: 'application/form-data',
           'auth-token': `${localStorage.getItem('auth-token')}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({"itemId":itemId}),
+        body: JSON.stringify({ "itemId": itemId, user : { "id": localStorage.getItem('user-id')}  }),
       })
-      .then((response)=>response.json())
-      .then((data)=>console.log(data));
+        .then((response) => response.json())
+        .then((data) => console.log(data));
     }
   }
 
   const getTotalCartAmount = () => {
     let totalAmount = 0;
-    for(const item in cartItems)
-    {
-      if(cartItems[item]>0)
-      {
-        let itemInfo = all_product.find((product)=>product.id===Number(item))
+    for (const item in cartItems) {
+      if (cartItems[item] > 0) {
+        let itemInfo = all_product.find((product) => product.id === Number(item))
         totalAmount += itemInfo.new_price * cartItems[item];
       }
     }
@@ -83,18 +81,16 @@ const ShopContextProvider = (props) => {
 
   const getTotalCartItems = () => {
     let totalItem = 0;
-    for(const item in cartItems)
-    {
-      if(cartItems[item]>0)
-      {
+    for (const item in cartItems) {
+      if (cartItems[item] > 0) {
         totalItem += cartItems[item];
       }
     }
     return totalItem;
   }
 
-  const contextValue = {getTotalCartItems,getTotalCartAmount,all_product,cartItems,addToCart,removeFromCart};
-  
+  const contextValue = { getTotalCartItems, getTotalCartAmount, all_product, cartItems, addToCart, removeFromCart };
+
   return (
     <ShopContext.Provider value={contextValue}>
       {props.children}

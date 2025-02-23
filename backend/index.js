@@ -5,12 +5,12 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
-// const cors =  require("cors");
+const cors =  require("cors");
 const { request } = require("http");
 const { log } = require("console");
 
 app.use(express.json());
-// app.use(cors());
+app.use(cors());
 
 // Database Connection with MongoDB
 
@@ -82,7 +82,7 @@ app.post('/signup',async (req,res) => {
   }
 
   const token = jwt.sign(data,'secret_ecom');
-  res.json({success:true,token})
+  res.json({success:true,token, userId: user.id})
 })
 
 const upload = multer({storage:storage})
@@ -194,7 +194,7 @@ app.post('/login',async (req,res) => {
         }
       }
       const token = jwt.sign(data,'secret_ecom')
-      res.json({success:true,token});
+      res.json({success:true,token, userId: user.id});
     }
     else{
       res.json({success:false,errors:"Wrong Password"});
@@ -241,21 +241,21 @@ app.get('/popularinwomen', async(req,res)=>{
 
 
 //creating endpoint for adding products in cartdata
-app.post('/addtocart', async ()=>{
+app.post('/addtocart', async (req,res)=>{
   console.log('added',req.body.itemId);
-  let userData = await Users.findOne({_id: req.user.id});
-  userData.cartData[req.body.itemId] += 1;
-  await Users.findOneAndUpdate({_id:req.user.id},{cartData:userData.cartData});
+  let userData = await Users.findOne({_id: req.body.user.id});
+  userData.cartData[req.body.itemId] = (userData.cartData[req.body.itemId] || 0) + 1;
+  await Users.findOneAndUpdate({_id:req.body.user.id},{cartData:userData.cartData});
   res.send("Added")
 })
 
 // craeting endpoint to remove the product from cart data
 app.post('/removefromcart',fetchUser,async (req,res) => {
   console.log('removed',req.body.itemId);
-  let userData = await Users.findOne({_id: req.user.id});
+  let userData = await Users.findOne({_id: req.body.user.id});
   if(userData.cartData[req.body.itemId]>0)
   userData.cartData[req.body.itemId] -= 1;
-  await Users.findOneAndUpdate({_id:req.user.id},{cartData:userData.cartData});
+  await Users.findOneAndUpdate({_id:req.body.user.id},{cartData:userData.cartData});
   res.send("Removed")
 })
 
@@ -263,7 +263,7 @@ app.post('/removefromcart',fetchUser,async (req,res) => {
 
 app.post('/getcart',fetchUser,async (req,res) =>{
   console.log("GetCart");
-  let userData = await Users.findOne({_id:req.user.id})
+  let userData = await Users.findOne({_id:req.body.user.id});
   res.json(userData.cartData);
 })
  
